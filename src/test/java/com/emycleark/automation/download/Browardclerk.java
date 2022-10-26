@@ -108,6 +108,11 @@ public class Browardclerk {
         		driver.navigate().back();
         	}
         }
+        //click on Right Arrow button to move next page
+     WebElement nextPageElem = driver.findElement(By.xpath("//span[contains(text(),'Go to the next page')]"));
+		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		executor.executeScript("arguments[0].click();", nextPageElem);
+    		 
     	
 		
 

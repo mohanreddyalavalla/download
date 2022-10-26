@@ -1,6 +1,7 @@
 package com.emycleark.automation.download;
 
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -157,7 +158,7 @@ public class DownloadComplaintFiles {
 	private static void downloadLocally(byte[] pdfFile, String caseId) {
 		FileOutputStream fos;
 		try {
-			fos = new FileOutputStream(System.getProperty("user.home") + "/" + "DownloadsPDF"+"/"+ caseId + ".pdf");
+			fos = new FileOutputStream(System.getProperty("user.home") + File.separator + "DownloadsPDF"+"/"+ caseId + ".pdf");
 			fos.write(pdfFile);
 			fos.close();
 		} catch (FileNotFoundException e) {
