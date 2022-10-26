@@ -1,12 +1,17 @@
 package com.emycleark.automation.download;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URLEncodedUtils;
@@ -15,9 +20,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -32,13 +41,12 @@ public class Browardclerk {
 	static WebDriverWait wait;
 	static WebDriver driver;
 	static ResponseSpecification responseSpec = null;
-	static String caseNumber = null;
 	static String href = null;
 	static String caseId = null;
 	static String caseNum = null;
 
 
-	public static void main(String[] args) throws InterruptedException, URISyntaxException {
+	public static void main(String[] args) throws InterruptedException, URISyntaxException, AWTException {
 		WebDriverManager.chromedriver().setup();
 		driver = new ChromeDriver();
 		driver.manage().window().maximize();
@@ -62,34 +70,46 @@ public class Browardclerk {
 		String [] temp = getTotalItems.split("of");
         String [] temp1 = temp[1].trim().split(" ");
         int length = Integer.parseInt(temp1[0]);
-        caseNumbers = new HashMap<String, String>();
-    	List<WebElement> caseNumbersEle = driver.findElements(By.xpath("//a[@class='anchor-tag-darklink']"));
-		for(WebElement e:caseNumbersEle) {
-			href = e.getAttribute("href");
-			caseNumber = e.getText();
-			caseNumbers.put(caseNumber, href);
-			List<NameValuePair> params = URLEncodedUtils.parse(new URI(href), Charset.forName("UTF-8"));
-			for (NameValuePair param : params) {
-				System.out.println(param.getName() + " : " + param.getValue());
-				caseNumbers.put(param.getName(), param.getValue());
-			}
-			RequestSpecification requestSpec = RestAssured.given().baseUri("https://www.browardclerk.org");
-			requestSpec.header("Origin", "https://www.browardclerk.org");
-			requestSpec.header("Referer", "https://www.browardclerk.org");
-			requestSpec.header("Accept", "*/*");
-			requestSpec.header("Content-Type", "text/html");
-			Response response = requestSpec.with().queryParam("caseid", caseId).queryParam("caseNum", caseNum).queryParam("category", "CV")
-					.queryParam("accessLevelCodeOUT", "ANONYMOUS")
-					.queryParam("ato", "D")
-					.get("/Web2/CaseSearchECA/CaseDetail");
-			System.out.println("Status Code :- "+response.getStatusCode());
-			Document html = Jsoup.parse(response.asPrettyString());
-			System.out.println(html);
-			Element comp = null;
-			String downloadUrl = null;
-			Elements allElements = html.select("a[href*=/Doc");
-			
-		}
+        
+        int pagecount = length/10;
+        for(int i=1;i<=pagecount;i++) {
+        	List<WebElement> caseNumbersEle = driver.findElements(By.xpath("//a[@class='anchor-tag-darklink']"));
+        	for(WebElement element:caseNumbersEle) {
+        		href = element.getAttribute("href");
+    			String caseNumber = element.getText();
+    			WebElement caseElement = driver.findElement(By.xpath("//a[contains(text(),'"+caseNumber+"')]"));
+    			JavascriptExecutor executor = (JavascriptExecutor)driver;
+    			executor.executeScript("arguments[0].click();", caseElement);
+    			WebElement complaintNumber = driver.findElement(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i"));
+    			JavascriptExecutor executor1 = (JavascriptExecutor)driver;
+    			executor1.executeScript("arguments[0].click();", complaintNumber);
+    		    String mainWindowHandle  = driver.getWindowHandle();
+    		    Set<String> allwindows = driver.getWindowHandles();
+    		    Iterator<String> iterator = allwindows.iterator();
+    		    while(iterator.hasNext()) {
+    		    	String childWindow = iterator.next();
+    		    	if(!mainWindowHandle.equalsIgnoreCase(childWindow)) {
+    		    		driver.switchTo().window(childWindow);
+    	    	Thread.sleep(1000);
+    	    	Robot robot = new Robot();
+    	    	robot.keyPress(KeyEvent.VK_CONTROL);
+    	    	robot.keyPress(KeyEvent.VK_S);
+    	    	Thread.sleep(1000);
+    	    	robot.keyRelease(KeyEvent.VK_CONTROL);
+    	    	robot.keyRelease(KeyEvent.VK_S);
+    	    	robot.keyPress(KeyEvent.VK_ENTER);
+    	    	Thread.sleep(5000);
+    	    	robot.keyRelease(KeyEvent.VK_ENTER);
+    	    	Thread.sleep(10000);
+    	    	driver.close();
+    		    	}
+    		    }
+        		driver.switchTo().window(mainWindowHandle);
+        		driver.navigate().back();
+        	}
+        }
+    	
+		
 
 
 	}
