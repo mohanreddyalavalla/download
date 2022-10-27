@@ -80,6 +80,9 @@ public class Browardclerk {
     			WebElement caseElement = driver.findElement(By.xpath("//a[contains(text(),'"+caseNumber+"')]"));
     			JavascriptExecutor executor = (JavascriptExecutor)driver;
     			executor.executeScript("arguments[0].click();", caseElement);
+    			WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(60));
+    			WebElement flag = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i")));
+    			if(flag.isDisplayed()) {
     			WebElement complaintNumber = driver.findElement(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i"));
     			JavascriptExecutor executor1 = (JavascriptExecutor)driver;
     			executor1.executeScript("arguments[0].click();", complaintNumber);
@@ -106,6 +109,9 @@ public class Browardclerk {
     		    }
         		driver.switchTo().window(mainWindowHandle);
         		driver.navigate().back();
+        	} else {
+        		break;
+        	}
         	}
         }
         //click on Right Arrow button to move next page
