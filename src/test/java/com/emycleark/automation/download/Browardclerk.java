@@ -78,6 +78,7 @@ public class Browardclerk {
         	for(WebElement element:caseNumbersEle) {
         		href = element.getAttribute("href");
     			String caseNumber = element.getText();
+    			System.out.println(caseNumber);
     			WebElement caseElement = driver.findElement(By.xpath("//a[contains(text(),'"+caseNumber+"')]"));
     			JavascriptExecutor executor = (JavascriptExecutor)driver;
     			executor.executeScript("arguments[0].click();", caseElement);
@@ -115,11 +116,13 @@ public class Browardclerk {
         		break;
         	}
         	}
+            //click on Right Arrow button to move next page
+        	System.out.println("Click on Right Arrow");
+            WebElement nextPageElem = driver.findElement(By.xpath("//span[contains(text(),'Go to the next page')]"));
+       		JavascriptExecutor executor = (JavascriptExecutor)driver;
+       		executor.executeScript("arguments[0].click();", nextPageElem);
         }
-        //click on Right Arrow button to move next page
-     WebElement nextPageElem = driver.findElement(By.xpath("//span[contains(text(),'Go to the next page')]"));
-		JavascriptExecutor executor = (JavascriptExecutor)driver;
-		executor.executeScript("arguments[0].click();", nextPageElem);
+
     		 
     	
 		
