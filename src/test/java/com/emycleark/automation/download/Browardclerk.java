@@ -22,6 +22,7 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -80,9 +81,9 @@ public class Browardclerk {
     			WebElement caseElement = driver.findElement(By.xpath("//a[contains(text(),'"+caseNumber+"')]"));
     			JavascriptExecutor executor = (JavascriptExecutor)driver;
     			executor.executeScript("arguments[0].click();", caseElement);
-    			WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(60));
-    			WebElement flag = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i")));
-    			if(flag.isDisplayed()) {
+    			//WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(60));
+    			//WebElement flag = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i")));
+    			if(isElementPresent()) {
     			WebElement complaintNumber = driver.findElement(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i"));
     			JavascriptExecutor executor1 = (JavascriptExecutor)driver;
     			executor1.executeScript("arguments[0].click();", complaintNumber);
@@ -110,6 +111,7 @@ public class Browardclerk {
         		driver.switchTo().window(mainWindowHandle);
         		driver.navigate().back();
         	} else {
+        		driver.navigate().back();
         		break;
         	}
         	}
@@ -123,6 +125,24 @@ public class Browardclerk {
 		
 
 
+	}
+	
+	
+	/**
+	* If a element is present, returns true, else return false
+	* @param WebElement whose presence is being checked
+	* @return true if webElement is present, else false
+	*/
+	public static boolean isElementPresent() {
+	  boolean exists = false;
+	  try {
+		WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(10));
+		 wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@title='Click to open Complaint (eFiled) document']/i")));
+	    exists = true;
+	  } catch (Exception e) {
+		  exists = false;
+	  }
+	  return exists;
 	}
 
 }
